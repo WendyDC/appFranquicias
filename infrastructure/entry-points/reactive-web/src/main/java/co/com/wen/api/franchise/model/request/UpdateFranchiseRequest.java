@@ -1,0 +1,18 @@
+package co.com.wen.api.franchise.model.request;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
+import lombok.Data;
+import lombok.extern.jackson.Jacksonized;
+
+@Data
+@Jacksonized
+@Builder(toBuilder = true)
+public class UpdateFranchiseRequest {
+
+	@JsonProperty("idFranchise")
+	String idFranchise;
+
+	@JsonProperty("name")
+	String name;
+}
