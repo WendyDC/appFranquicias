@@ -2,12 +2,14 @@ package co.com.wen.api;
 
 import co.com.wen.api.franchise.FranchiseHandler;
 import co.com.wen.api.franchise.FranchiseRouterRest;
-import co.com.wen.api.franchise.model.request.AddBranchRequest;
-import co.com.wen.api.franchise.model.request.CreateFranchiseRequest;
-import co.com.wen.api.franchise.model.FranchiseResponse;
-import co.com.wen.api.franchise.model.request.UpdateFranchiseRequest;
-import co.com.wen.api.util.Constants;
-import co.com.wen.model.exception.FranchiseException;
+import co.com.wen.api.franchise.model.AddBranchRequest;
+import co.com.wen.api.franchise.model.CreateFranchiseRequest;
+import co.com.wen.api.franchise.model.UpdateFranchiseRequest;
+import co.com.wen.api.model.RestResponse;
+import co.com.wen.api.util.RestConstants;
+import co.com.wen.model.branch.Branch;
+import co.com.wen.model.branch.gateways.BranchRepository;
+import co.com.wen.model.exception.BusinessException;
 import co.com.wen.model.franchise.Franchise;
 import co.com.wen.model.franchise.gateways.FranchiseRepository;
 import co.com.wen.model.util.MessageError;
@@ -34,6 +36,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {FranchiseRouterRest.class, FranchiseHandler.class})
@@ -49,9 +52,13 @@ class FranchiseRouterRestTest {
 	@MockitoBean
 	private FranchiseRepository franchiseRepository;
 
+	@MockitoBean
+	private BranchRepository branchRepository;
+
     private WebTestClient webTestClient;
 
-	private static String NAME_FRANCHISE = "WEN.SA";
+	private static final String NAME_FRANCHISE = "WEN.SA";
+	private static final String NAME_BRANCH = "CUCUTA-JARDIN PLAZA";
 
 	@BeforeEach
 	void setUp() {
@@ -64,21 +71,21 @@ class FranchiseRouterRestTest {
 
     @Test
     void listenPOSTCreateFranchiseUseCase() {
-
+	    when(franchiseRepository.save(any())).thenReturn(Mono.just(buildFranchise()));
 	    given(franchiseUseCase.createFranchise(any()))
 			    .willReturn(Mono.just(buildFranchise()));
 
         webTestClient.post()
-                .uri(Constants.PATH_FRANCHISE)
+                .uri(RestConstants.PATH_FRANCHISE)
                 .accept(MediaType.APPLICATION_JSON)
 		        .bodyValue(buildCreateFranchiseRequest())
                 .exchange()
                 .expectStatus()
 		        .isOk()
-                .expectBody(FranchiseResponse.class)
-                .value(franchiseResponse -> {
-							Assertions.assertThat(franchiseResponse.getStatus().getCode()).isEqualTo("200");
-							assertNotNull(franchiseResponse);
+                .expectBody(RestResponse.class)
+                .value(restResponse -> {
+							Assertions.assertThat(restResponse.getStatus().getCode()).isEqualTo("200");
+							assertNotNull(restResponse);
                         }
                 );
 		verify(franchiseUseCase, times(1)).createFranchise(any());
@@ -86,24 +93,35 @@ class FranchiseRouterRestTest {
 
 	@Test
 	void listenPOSTCreateFranchiseErrorUseCase() {
-
+		when(franchiseRepository.save(any())).thenReturn(Mono.just(buildFranchise()));
 		given(franchiseUseCase.createFranchise(any()))
-				.willReturn(Mono.error(new FranchiseException(MessageError.NOT_SAVE_RECORD)));
+				.willReturn(Mono.error(new BusinessException(MessageError.NOT_SAVE_RECORD)));
 
 		webTestClient.post()
-				.uri(Constants.PATH_FRANCHISE)
+				.uri(RestConstants.PATH_FRANCHISE)
 				.accept(MediaType.APPLICATION_JSON)
 				.bodyValue(buildCreateFranchiseRequest())
 				.exchange()
 				.expectStatus()
-				.is5xxServerError()
-				.expectBody(FranchiseResponse.class)
-				.value(franchiseResponse -> {
-							Assertions.assertThat(franchiseResponse.getStatus().getCode()).isEqualTo("500");
-							assertNotNull(franchiseResponse);
+				.isOk()
+				.expectBody(RestResponse.class)
+				.value(restResponse -> {
+							Assertions.assertThat(restResponse.getStatus().getCode()).isEqualTo("500");
+							assertNotNull(restResponse);
 						}
 				);
 		verify(franchiseUseCase, times(1)).createFranchise(any());
+	}
+
+	@Test
+	void listenPOSTCreateFranchiseEmptyBodyTest() {
+		webTestClient.post()
+				.uri(RestConstants.PATH_FRANCHISE)
+				.accept(MediaType.APPLICATION_JSON)
+				.bodyValue(CreateFranchiseRequest.builder().build())
+				.exchange()
+				.expectStatus()
+				.is4xxClientError();
 	}
 
 	private CreateFranchiseRequest buildCreateFranchiseRequest() {
@@ -112,51 +130,124 @@ class FranchiseRouterRestTest {
 
 	@Test
     void listenPOSTAddBranchUseCase() {
-		given(franchiseUseCase.addBranch(anyInt(),anyInt()))
+		when(franchiseRepository.findById(anyInt())).thenReturn(Mono.just(buildFranchise()));
+		when(branchRepository.save(any())).thenReturn(Mono.just(Branch.builder().build()));
+		when(franchiseRepository.save(any())).thenReturn(Mono.just(buildFranchise()));
+		given(franchiseUseCase.addBranch(anyInt(),any()))
 				.willReturn(Mono.just(buildFranchise()));
 
         webTestClient.post()
-                .uri(Constants.PATH_FRANCHISE_BRANCH)
+                .uri(RestConstants.PATH_FRANCHISE_BRANCH)
                 .accept(MediaType.APPLICATION_JSON)
-		        .bodyValue(builderAddBranchRequest())
+		        .bodyValue(buildAddBranchRequest())
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(FranchiseResponse.class)
-		        .value(franchiseResponse -> {
-					        Assertions.assertThat(franchiseResponse.getStatus().getCode()).isEqualTo("200");
-					        assertNotNull(franchiseResponse);
+                .expectBody(RestResponse.class)
+		        .value(restResponse -> {
+					        Assertions.assertThat(restResponse.getStatus().getCode()).isEqualTo("200");
+					        assertNotNull(restResponse);
 				        }
 		        );
-		verify(franchiseUseCase, times(1)).addBranch(anyInt(),anyInt());
+		verify(franchiseUseCase, times(1)).addBranch(anyInt(),any());
     }
 
-	private static AddBranchRequest builderAddBranchRequest() {
-		return AddBranchRequest.builder().idBranch("1").idFranchise("1").build();
+	@Test
+	void listenPOSTAddBranchErrorUseCase() {
+		when(franchiseRepository.findById(anyInt())).thenReturn(Mono.just(buildFranchise()));
+		when(branchRepository.save(any())).thenReturn(Mono.just(Branch.builder().build()));
+		when(franchiseRepository.save(any())).thenReturn(Mono.just(buildFranchise()));
+		given(franchiseUseCase.addBranch(anyInt(),any()))
+				.willReturn(Mono.error(new BusinessException(MessageError.DUPLICATED_RECORD)));
+
+		webTestClient.post()
+				.uri(RestConstants.PATH_FRANCHISE_BRANCH)
+				.accept(MediaType.APPLICATION_JSON)
+				.bodyValue(buildAddBranchRequest())
+				.exchange()
+				.expectStatus()
+				.isOk()
+				.expectBody(RestResponse.class)
+				.value(restResponse -> {
+							Assertions.assertThat(restResponse.getStatus().getCode()).isEqualTo("500");
+							assertNotNull(restResponse);
+						}
+				);
+		verify(franchiseUseCase, times(1)).addBranch(anyInt(),any());
+	}
+
+	@Test
+	void listenPOSTAddBranchEmptyBodyTest() {
+		webTestClient.post()
+				.uri(RestConstants.PATH_FRANCHISE)
+				.accept(MediaType.APPLICATION_JSON)
+				.bodyValue(AddBranchRequest.builder().build())
+				.exchange()
+				.expectStatus()
+				.is4xxClientError();
+	}
+
+	private static AddBranchRequest buildAddBranchRequest() {
+		return AddBranchRequest.builder().nameBranch(NAME_BRANCH).idFranchise("1").build();
 	}
 
 	@Test
     void listenPUTUpdateFranchiseUseCase() {
-
+		when(franchiseRepository.findById(anyInt())).thenReturn(Mono.just(buildFranchise()));
+		when(franchiseRepository.save(any())).thenReturn(Mono.just(buildFranchise()));
 		given(franchiseUseCase.updateFranchise(anyInt(), any()))
 				.willReturn(Mono.just(buildFranchise()));
 
         webTestClient.put()
-                .uri(Constants.PATH_FRANCHISE)
+                .uri(RestConstants.PATH_FRANCHISE)
                 .accept(MediaType.APPLICATION_JSON)
-                .bodyValue(builderUpdateFranchiseRequest())
+                .bodyValue(buildUpdateFranchiseRequest())
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(FranchiseResponse.class)
-		        .value(franchiseResponse -> {
-					        Assertions.assertThat(franchiseResponse.getStatus().getCode()).isEqualTo("200");
-					        assertNotNull(franchiseResponse);
+                .expectBody(RestResponse.class)
+		        .value(restResponse -> {
+					        Assertions.assertThat(restResponse.getStatus().getCode()).isEqualTo("200");
+					        assertNotNull(restResponse);
 				        }
 		        );
 	    verify(franchiseUseCase, times(1)).updateFranchise(anyInt(), any());
     }
 
-	private static UpdateFranchiseRequest builderUpdateFranchiseRequest() {
-		return UpdateFranchiseRequest.builder().idFranchise("1").name(NAME_FRANCHISE).build();
+	@Test
+	void listenPUTUpdateFranchiseErrorUseCase() {
+		when(franchiseRepository.findById(anyInt())).thenReturn(Mono.just(buildFranchise()));
+		when(franchiseRepository.save(any())).thenReturn(Mono.just(buildFranchise()));
+		given(franchiseUseCase.updateFranchise(anyInt(), any()))
+				.willReturn(Mono.error(new BusinessException(MessageError.NOT_SAVE_RECORD)));
+
+		webTestClient.put()
+				.uri(RestConstants.PATH_FRANCHISE)
+				.accept(MediaType.APPLICATION_JSON)
+				.bodyValue(buildUpdateFranchiseRequest())
+				.exchange()
+				.expectStatus()
+				.isOk()
+				.expectBody(RestResponse.class)
+				.value(restResponse -> {
+							Assertions.assertThat(restResponse.getStatus().getCode()).isEqualTo("500");
+							assertNotNull(restResponse);
+						}
+				);
+		verify(franchiseUseCase, times(1)).updateFranchise(anyInt(),any());
+	}
+
+	@Test
+	void listenPUTUpdateFranchiseEmptyBodyTest() {
+		webTestClient.put()
+				.uri(RestConstants.PATH_FRANCHISE)
+				.accept(MediaType.APPLICATION_JSON)
+				.bodyValue(UpdateFranchiseRequest.builder().build())
+				.exchange()
+				.expectStatus()
+				.is4xxClientError();
+	}
+
+	private static UpdateFranchiseRequest buildUpdateFranchiseRequest() {
+		return UpdateFranchiseRequest.builder().idFranchise("1").newNameFranchise(NAME_FRANCHISE).build();
 	}
 
 	private Franchise buildFranchise() {

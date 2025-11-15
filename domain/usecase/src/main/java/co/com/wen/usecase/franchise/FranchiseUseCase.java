@@ -1,5 +1,6 @@
 package co.com.wen.usecase.franchise;
 
+import co.com.wen.model.branch.Branch;
 import co.com.wen.model.branch.gateways.BranchRepository;
 import co.com.wen.model.exception.BusinessException;
 import co.com.wen.model.franchise.Franchise;
@@ -15,33 +16,33 @@ public class FranchiseUseCase {
 	private final BranchRepository branchRepository;
 
 	public Mono<Franchise> createFranchise(String name) {
-		return franchiseRepository.save(builderFranchise(name))
+		return franchiseRepository.save(buildFranchise(name))
 				.switchIfEmpty(Mono.error(new BusinessException(MessageError.NOT_SAVE_RECORD)));
 	}
 
-	private Franchise builderFranchise(String name) {
+	private Franchise buildFranchise(String name) {
 		return Franchise.builder().name(name).build();
 	}
 
-	public Mono<Franchise> addBranch(int idFranchise, int idBranch) {
+	public Mono<Franchise> addBranch(int idFranchise, String nameBranch) {
 		return franchiseRepository.findById(idFranchise)
 				.flatMap(franchise -> {
-					validateBranchExistence(franchise, idBranch);
-					return addBranchFranchise(franchise, idBranch);
+					validateBranchExistence(franchise, nameBranch);
+					return addBranchFranchise(franchise, nameBranch);
 				});
 	}
 
-	private void validateBranchExistence(Franchise franchise, int idBranch) {
+	private void validateBranchExistence(Franchise franchise, String nameBranch) {
 		franchise.getBranches().stream()
-				.filter(branch -> branch.getId() == idBranch)
+				.filter(branch -> branch.getName().equalsIgnoreCase(nameBranch))
 				.findFirst()
 				.ifPresent(branch -> {
 					Mono.error(new BusinessException(MessageError.DUPLICATED_RECORD));
 				});
 	}
 
-	private Mono<Franchise> addBranchFranchise(Franchise franchise, int idBranch) {
-		return branchRepository.findById(idBranch)
+	private Mono<Franchise> addBranchFranchise(Franchise franchise, String nameBranch) {
+		return branchRepository.save(buildBranch(franchise, nameBranch))
 				.flatMap(branch -> {
 					Franchise updatedFranchise = franchise.toBuilder()
 							.branches(
@@ -55,10 +56,15 @@ public class FranchiseUseCase {
 				});
 	}
 
-	public Mono<Franchise> updateFranchise(int idFranchise, String name) {
+	private Branch buildBranch(Franchise franchise, String nameBranch) {
+		return Branch.builder().name(nameBranch).idFranchise(franchise.getId()).build();
+	}
+
+	public Mono<Franchise> updateFranchise(int idFranchise, String newNameFranchise) {
 		return franchiseRepository.findById(idFranchise)
+				.switchIfEmpty(Mono.error(new BusinessException(MessageError.RECORD_NOT_FOUND)))
 				.flatMap(franchise -> {
-					Franchise updatedFranchise = franchise.toBuilder().name(name).build();
+					Franchise updatedFranchise = franchise.toBuilder().name(newNameFranchise).build();
 					return franchiseRepository.save(updatedFranchise);
 				});
 	}

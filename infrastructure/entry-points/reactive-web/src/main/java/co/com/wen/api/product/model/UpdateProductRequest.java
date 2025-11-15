@@ -1,4 +1,4 @@
-package co.com.wen.api.franchise.model.request;
+package co.com.wen.api.product.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
@@ -8,11 +8,10 @@ import lombok.extern.jackson.Jacksonized;
 @Data
 @Jacksonized
 @Builder(toBuilder = true)
-public class UpdateFranchiseRequest {
+public class UpdateProductRequest {
+	@JsonProperty("idProduct")
+	String idProduct;
 
-	@JsonProperty("idFranchise")
-	String idFranchise;
-
-	@JsonProperty("name")
-	String name;
+	@JsonProperty("newNameProduct")
+	String newNameProduct;
 }

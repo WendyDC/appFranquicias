@@ -1,6 +1,5 @@
-package co.com.wen.api.franchise.model;
+package co.com.wen.api.model;
 
-import co.com.wen.api.model.RestStatus;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.jackson.Jacksonized;
@@ -8,7 +7,7 @@ import lombok.extern.jackson.Jacksonized;
 @Data
 @Jacksonized
 @Builder(toBuilder = true)
-public class FranchiseResponse {
+public class RestResponse {
 	RestStatus status;
 	Object data;
 }

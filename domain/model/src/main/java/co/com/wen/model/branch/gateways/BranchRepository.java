@@ -5,4 +5,5 @@ import reactor.core.publisher.Mono;
 
 public interface BranchRepository {
 	Mono<Branch> findById(int id);
+	Mono<Branch> save(Branch branch);
 }

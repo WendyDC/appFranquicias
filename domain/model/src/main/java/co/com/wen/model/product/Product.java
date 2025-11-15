@@ -1,11 +1,13 @@
 package co.com.wen.model.product;
 
 import lombok.Builder;
-import lombok.Value;
+import lombok.Data;
 
-@Value
+@Data
 @Builder(toBuilder = true)
 public class Product {
 	int id;
+	int idBranch;
 	String name;
+	int stock;
 }

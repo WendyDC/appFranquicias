@@ -9,10 +9,11 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.*
 
 @Configuration
 public class FranchiseRouterRest {
+
     @Bean
     public RouterFunction<ServerResponse> routerFunction(FranchiseHandler franchiseHandler) {
-        return route(POST(Constants.PATH_FRANCHISE), franchiseHandler::listenPOSTCreateFranchiseUseCase)
-                .andRoute(POST(Constants.PATH_FRANCHISE_BRANCH), franchiseHandler::listenPOSTAddBranchUseCase)
-		        .and(route(PUT(Constants.PATH_FRANCHISE), franchiseHandler::listenPUTUpdateFranchiseUseCase));
+        return route(POST(RestConstants.PATH_FRANCHISE), franchiseHandler::listenPOSTCreateFranchiseUseCase)
+                .andRoute(POST(RestConstants.PATH_FRANCHISE_BRANCH), franchiseHandler::listenPOSTAddBranchUseCase)
+		        .and(route(PUT(RestConstants.PATH_FRANCHISE), franchiseHandler::listenPUTFranchiseUseCase));
     }
 }
