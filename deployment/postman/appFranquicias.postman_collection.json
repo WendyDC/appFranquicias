@@ -1,0 +1,349 @@
+{
+	"info": {
+		"_postman_id": "494e56a7-964e-4821-ad0b-32e6ad55bc6c",
+		"name": "appFranquicias",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48436306",
+		"_collection_link": "https://wendydc-9653875.postman.co/workspace/wcarrascal's-Workspace~47282940-8e76-406c-8b19-e42a7ee7b363/collection/48436306-494e56a7-964e-4821-ad0b-32e6ad55bc6c?action=share&source=collection_link&creator=48436306"
+	},
+	"item": [
+		{
+			"name": "Franchise",
+			"item": [
+				{
+					"name": "CreateFranchise",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "traceId",
+								"value": "123456",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\" : \"name-franchise\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/franquicias",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"franquicias"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AddBranchFranchise",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "traceId",
+								"value": "123456",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"idFranchise\" : \"1\",\r\n    \"nameBranch\" : \"name-branch\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/franquicias/sucursales",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"franquicias",
+								"sucursales"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateFranchise",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "traceId",
+								"value": "123456",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"idFranchise\" : \"1\",\r\n    \"newNameFranchise\" : \"new-name-franchise\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/franquicias",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"franquicias"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "queryFranchise",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "traceId",
+								"value": "123456",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{   \r\n    \"idFranchise\" : \"7\",\r\n    \"type\" : \"MAX_STOCK\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/franquicias/query",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"franquicias",
+								"query"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Branch",
+			"item": [
+				{
+					"name": "AddProductBranch",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "traceId",
+								"value": "123456",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"idBranch\" : \"1\",\r\n    \"nameProduct\" : \"name-product\",\r\n    \"stockProduct\" : \"15\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/sucursales/productos",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"sucursales",
+								"productos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteProductBranch",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "traceId",
+								"value": "123456",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"idBranch\" : \"1\",\r\n    \"idProduct\" : \"1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/sucursales/productos",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"sucursales",
+								"productos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateStockProduct",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "traceId",
+								"value": "123456",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"idBranch\" : \"1\",\r\n    \"idProduct\" : \"1\",\r\n    \"newStock\" : \"15\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/sucursales/productos",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"sucursales",
+								"productos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateNameBranch",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "traceId",
+								"value": "123456",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"idBranch\" : \"1\",\r\n    \"newNameBranch\" : \"new-name-branch\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/sucursales",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"sucursales"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Product",
+			"item": [
+				{
+					"name": "updateNameProduct",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "traceId",
+								"value": "123456",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"idProduct\" : \"1\",\r\n    \"newNameProduct\" : \"new-product-default\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/productos",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"productos"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

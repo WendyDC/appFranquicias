@@ -1,0 +1,26 @@
+CREATE TABLE IF NOT EXISTS franchise (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    UNIQUE (name)
+);
+
+CREATE TABLE IF NOT EXISTS branch (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    id_franchise INTEGER NOT NULL,
+    FOREIGN KEY (id_franchise)
+        REFERENCES franchise(id)
+        ON DELETE CASCADE,
+    UNIQUE (name, id_franchise)
+);
+
+CREATE TABLE IF NOT EXISTS product (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    id_branch INTEGER NOT NULL,
+    stock INTEGER NOT NULL,
+    FOREIGN KEY (id_branch)
+        REFERENCES branch(id)
+        ON DELETE CASCADE,
+    UNIQUE (name, id_branch)
+);
