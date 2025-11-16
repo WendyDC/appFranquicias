@@ -8,8 +8,24 @@ Aplicación para la gestión de franquicias, sucursales y productos.
 - Gradle 8.5
 - Spring Boot \ WebFlux 3.5.4
 - Spring Data R2DBC - R2DBC PostgreSQL
-- Lombok 1.18.38
-- MapStruct 1.6.3
+
+## Ejecucion Docker compose
+
+### Pasos a seguir
+1. Clonar este repositorio en la maquina local.
+2. Abrir la linea de comandos dentro de la carpeta raiz (donde este el docker-compose).
+3. Ejecutar el siguiente comando:
+```
+docker compose up -d
+```
+4. En caso de terminar o bajar los servicios levantados:
+```
+docker compose down
+```
+5. Finalmente la aplicación esta disponible para usar por:
+```
+http://localhost:8080/
+```
 
 ## Operaciones
 
@@ -24,6 +40,17 @@ Aplicación para la gestión de franquicias, sucursales y productos.
 | PUT | `/api/v1/sucursales/productos` | Actualizar stock                     | `{ "idBranch": "", "idProduct": "", "newStock": "" }`       | Todos los campos requeridos.                                       |
 | PUT | `/api/v1/sucursales` | Actualizar sucursal                  | `{ "idBranch": "", "newNameBranch": "" }`                   | Todos los campos requeridos. `newNameBranch` único por franquicia. |
 | PUT | `/api/v1/productos` | Actualizar producto                  | `{ "idProduct": "", "newNameProduct": "" }`                 | Todos los campos requeridos. `newNameProduct` único por sucursal.  |
+
+# Colecciones Postman
+
+Ruta: [appFranquicias.postman_collection.json](deployment/postman/appFranquicias.postman_collection.json)
+
+# Esquema Base de Datos
+
+Ruta: [init.sql](deployment/db/init.sql)
+
+![bd_diagrama](deployment/db/bd_diagrama.png)
+
 
 # Proyecto Base Implementando Clean Architecture
 
