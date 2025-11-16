@@ -43,7 +43,7 @@ http://localhost:8080/
 
 # Colecciones Postman
 
-Ruta: [Franquicias.postman_collection.json](deployment/postman/Franquicias.postman_collection.json)
+Ruta: [appFranquicias.postman_collection.json](deployment/postman/appFranquicias.postman_collection.json)
 
 # Esquema Base de Datos
 
