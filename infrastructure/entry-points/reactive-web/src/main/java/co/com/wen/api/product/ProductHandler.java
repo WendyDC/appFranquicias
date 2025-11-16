@@ -21,12 +21,18 @@ public class ProductHandler {
 
 	private final ProductUseCase productUseCase;
 
-	public Mono<ServerResponse> listenPUTUpdateProductUseCase(ServerRequest serverRequest) {
+	public Mono<ServerResponse> listenPUTProductUseCase(ServerRequest serverRequest) {
 		String traceId = RestUtil.getTraceId(serverRequest);
 		return serverRequest
 				.bodyToMono(UpdateProductRequest.class)
 				.doOnSuccess(request -> RestUtil.logInfoDetails("request UpdateProduct", request, traceId))
-				.flatMap(request -> updateProductUseCase(request, traceId));
+				.flatMap(request -> updateProductUseCase(request, traceId))
+				.switchIfEmpty(
+						RestUtil.buildGenericResponse(
+								HttpStatus.BAD_REQUEST,
+								RestUtil.buildErrorResponse(new FranchiseException(MessageError.INVALID_REQUEST))
+						)
+				);
 	}
 
 	private Mono<ServerResponse> updateProductUseCase(UpdateProductRequest request, String traceId) {

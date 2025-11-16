@@ -35,4 +35,12 @@ public class ProductRepositoryAdapter extends ReactiveAdapterOperations<
 				.doOnError(error -> R2dbUtil.logInfoError("findByIdProduct", error.getMessage(), traceId))
 				.onErrorMap(error -> new TechnicalException(MessageError.GENERIC_ERROR));
 	}
+
+	@Override
+	public Mono<Void> delete (Product product, String traceId) {
+		Integer idProduct = product.getId();
+		return deleteById(idProduct)
+				.doOnError(error -> R2dbUtil.logInfoError("deleteById", error.getMessage(), traceId))
+				.onErrorMap(error -> new TechnicalException(MessageError.GENERIC_ERROR));
+	}
 }

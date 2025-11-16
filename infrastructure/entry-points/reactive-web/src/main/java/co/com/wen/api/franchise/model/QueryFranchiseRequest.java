@@ -1,4 +1,4 @@
-package co.com.wen.api.branch.model;
+package co.com.wen.api.franchise.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
@@ -8,7 +8,10 @@ import lombok.extern.jackson.Jacksonized;
 @Data
 @Jacksonized
 @Builder(toBuilder = true)
-public class QueryRequest {
+public class QueryFranchiseRequest {
+
+	@JsonProperty("idFranchise")
+	String idFranchise;
 
 	@JsonProperty("type")
 	String type;

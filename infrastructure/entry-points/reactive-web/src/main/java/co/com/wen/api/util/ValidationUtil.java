@@ -2,11 +2,10 @@ package co.com.wen.api.util;
 
 public class ValidationUtil {
 
-	public static boolean isNumeric(String valor){
+	public static boolean isNumeric(String valor) {
 		try {
-			Integer.parseInt(valor);
-			return Boolean.TRUE;
-		} catch (NumberFormatException e) {
+			return Integer.parseInt(valor) >= 0;
+		} catch (Exception e) {
 			return Boolean.FALSE;
 		}
 	}

@@ -1,6 +1,5 @@
 package co.com.wen.r2dbc.branch.model;
 
-import co.com.wen.r2dbc.franchise.model.FranchiseEntity;
 import co.com.wen.r2dbc.product.model.ProductEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,9 +27,6 @@ public class BranchEntity {
 
 	@Column("name")
 	String name;
-
-	@Transient
-	FranchiseEntity franchise;
 
 	@Transient
 	List<ProductEntity> products = new ArrayList<>();

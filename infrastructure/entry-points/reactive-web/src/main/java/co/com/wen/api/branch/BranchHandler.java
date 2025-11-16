@@ -2,7 +2,6 @@ package co.com.wen.api.branch;
 
 import co.com.wen.api.branch.model.AddProductRequest;
 import co.com.wen.api.branch.model.DeleteProductRequest;
-import co.com.wen.api.branch.model.QueryRequest;
 import co.com.wen.api.branch.model.UpdateBranchRequest;
 import co.com.wen.api.branch.model.UpdateStockRequest;
 import co.com.wen.api.util.RestUtil;
@@ -30,7 +29,13 @@ public class BranchHandler {
 		return serverRequest
 				.bodyToMono(AddProductRequest.class)
 				.doOnSuccess(request -> RestUtil.logInfoDetails("request AddProduct", request, traceId))
-				.flatMap(request -> addProductUseCase(request, traceId));
+				.flatMap(request -> addProductUseCase(request, traceId))
+				.switchIfEmpty(
+						RestUtil.buildGenericResponse(
+								HttpStatus.BAD_REQUEST,
+								RestUtil.buildErrorResponse(new FranchiseException(MessageError.INVALID_REQUEST))
+						)
+				);
 	}
 
 	private Mono<ServerResponse> addProductUseCase(AddProductRequest request, String traceId) {
@@ -67,7 +72,13 @@ public class BranchHandler {
 		return serverRequest
 				.bodyToMono(DeleteProductRequest.class)
 				.doOnSuccess(request -> RestUtil.logInfoDetails("request DeleteProduct", request, traceId))
-				.flatMap(request -> deleteProductUseCase(request, traceId));
+				.flatMap(request -> deleteProductUseCase(request, traceId))
+				.switchIfEmpty(
+						RestUtil.buildGenericResponse(
+								HttpStatus.BAD_REQUEST,
+								RestUtil.buildErrorResponse(new FranchiseException(MessageError.INVALID_REQUEST))
+						)
+				);
 	}
 
 	private Mono<ServerResponse> deleteProductUseCase (DeleteProductRequest request, String traceId) {
@@ -76,7 +87,7 @@ public class BranchHandler {
 								ValidationUtil.convertStringToInt(request.getIdBranch()),
 								ValidationUtil.convertStringToInt(request.getIdProduct()), traceId)
 						.doOnSuccess(response -> RestUtil.logInfoDetails("response DeleteProduct", response, traceId))
-						.flatMap(branch -> RestUtil.buildGenericResponse(HttpStatus.OK, RestUtil.buildSuccessResponse(branch)))
+						.then(RestUtil.buildGenericResponse(HttpStatus.OK, RestUtil.buildSuccessResponse("")))
 						.onErrorResume(
 								FranchiseException.class,
 								exception -> {
@@ -103,7 +114,13 @@ public class BranchHandler {
 		return serverRequest
 				.bodyToMono(UpdateStockRequest.class)
 				.doOnSuccess(request -> RestUtil.logInfoDetails("request UpdateStock", request, traceId))
-				.flatMap(request -> updateStockUseCase(request, traceId));
+				.flatMap(request -> updateStockUseCase(request, traceId))
+				.switchIfEmpty(
+						RestUtil.buildGenericResponse(
+								HttpStatus.BAD_REQUEST,
+								RestUtil.buildErrorResponse(new FranchiseException(MessageError.INVALID_REQUEST))
+						)
+				);
 	}
 
 	private Mono<ServerResponse> updateStockUseCase(UpdateStockRequest request, String traceId) {
@@ -113,7 +130,7 @@ public class BranchHandler {
 								ValidationUtil.convertStringToInt(request.getIdProduct()),
 								ValidationUtil.convertStringToInt(request.getNewStock()), traceId)
 						.doOnSuccess(response -> RestUtil.logInfoDetails("response UpdateStock", response, traceId))
-						.flatMap(branch -> RestUtil.buildGenericResponse(HttpStatus.OK, RestUtil.buildSuccessResponse(branch)))
+						.then(RestUtil.buildGenericResponse(HttpStatus.OK, RestUtil.buildSuccessResponse("")))
 						.onErrorResume(
 								FranchiseException.class,
 								exception -> {
@@ -137,43 +154,18 @@ public class BranchHandler {
 		return Mono.empty();
 	}
 
-	public Mono<ServerResponse> listenGETQueryUseCase(ServerRequest serverRequest) {
-		String traceId = RestUtil.getTraceId(serverRequest);
-		return serverRequest
-				.bodyToMono(QueryRequest.class)
-				.doOnSuccess(request -> RestUtil.logInfoDetails("request Query", request, traceId))
-				.flatMap(request -> getQueryUseCase(request, traceId));
-	}
-
-	private Mono<ServerResponse> getQueryUseCase(QueryRequest request, String traceId) {
-		return validateQueryRequest(request, traceId)
-				.switchIfEmpty(Mono.defer(() -> branchUseCase.query(request.getType(), traceId)
-						.doOnSuccess(response -> RestUtil.logInfoDetails("response Query", response, traceId))
-						.flatMap(branch -> RestUtil.buildGenericResponse(HttpStatus.OK, RestUtil.buildSuccessResponse(branch)))
-						.onErrorResume(
-								FranchiseException.class,
-								exception -> {
-									RestUtil.logInfoError("Query", exception.getMessageErrors(), traceId);
-									return RestUtil.buildGenericResponse(
-											HttpStatus.OK, RestUtil.buildErrorResponse(exception));
-								})));
-	}
-
-	private Mono<ServerResponse> validateQueryRequest(QueryRequest request, String traceId) {
-		if(request == null	|| ValidationUtil.isNullOrEmpty(request.getType())) {
-			RestUtil.logInfoError("Query", MessageError.INVALID_REQUEST, traceId);
-			return RestUtil.buildGenericResponse(
-					HttpStatus.BAD_REQUEST,	RestUtil.buildErrorResponse(new FranchiseException(MessageError.INVALID_REQUEST)));
-		}
-		return Mono.empty();
-	}
-
 	public Mono<ServerResponse> listenPUTBranchUseCase(ServerRequest serverRequest) {
 		String traceId = RestUtil.getTraceId(serverRequest);
 		return serverRequest
 				.bodyToMono(UpdateBranchRequest.class)
 				.doOnSuccess(request -> RestUtil.logInfoDetails("request UpdateBranch", request, traceId))
-				.flatMap(request -> updateBranchUseCase(request, traceId));
+				.flatMap(request -> updateBranchUseCase(request, traceId))
+				.switchIfEmpty(
+						RestUtil.buildGenericResponse(
+								HttpStatus.BAD_REQUEST,
+								RestUtil.buildErrorResponse(new FranchiseException(MessageError.INVALID_REQUEST))
+						)
+				);
 	}
 
 	private Mono<ServerResponse> updateBranchUseCase(UpdateBranchRequest request, String traceId) {

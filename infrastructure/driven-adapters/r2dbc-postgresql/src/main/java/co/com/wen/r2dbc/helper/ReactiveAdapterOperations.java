@@ -64,4 +64,8 @@ public abstract class ReactiveAdapterOperations<E, D, I, R extends ReactiveCrudR
         return repository.findAll()
                 .map(this::toEntity);
     }
+
+	public Mono<Void> deleteById(I id) {
+		return repository.deleteById(id);
+	}
 }

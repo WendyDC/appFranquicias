@@ -40,7 +40,7 @@ public class BranchUseCase {
 					List<Product> updateProducts = branch.getProducts();
 					updateProducts.add(product);
 					Branch updatedBranch = branch.toBuilder().products(updateProducts).build();
-					return branchRepository.save(updatedBranch, traceId);
+					return Mono.just(updatedBranch);
 				});
 	}
 
@@ -49,66 +49,30 @@ public class BranchUseCase {
 	}
 
 
-	public Mono<Branch> deleteProduct(int idBranch, int idProduct, String traceId) {
+	public Mono<Void> deleteProduct(int idBranch, int idProduct, String traceId) {
+		return branchRepository.findById(idBranch, traceId)
+				.switchIfEmpty(Mono.error(new BusinessException(MessageError.RECORD_NOT_FOUND)))
+				.flatMap(branch -> branch.getProducts().stream()
+						.filter(p -> p.getId() == idProduct)
+						.findFirst()
+						.map(product -> productRepository.delete(product, traceId))
+						.orElseGet(() -> Mono.error(new BusinessException(MessageError.RECORD_NOT_FOUND))));
+	}
+
+	public Mono<Void> updateStock(int idBranch, int idProduct, int newStock, String traceId) {
 		return branchRepository.findById(idBranch, traceId)
 				.switchIfEmpty(Mono.error(new BusinessException(MessageError.RECORD_NOT_FOUND)))
 				.flatMap(branch -> {
-					List<Product> products = branch.getProducts() != null
-							? branch.getProducts()
-							: java.util.Collections.emptyList();
-
 					return branch.getProducts().stream()
 							.filter(p -> p.getId() == idProduct)
 							.findFirst()
 							.map(product -> {
-								List<Product> listProductUpdate = new java.util.ArrayList<>(products);
-								listProductUpdate.removeIf(p -> p.getId() == idProduct);
-
-								Branch updated = branch.toBuilder()
-										.products(listProductUpdate)
-										.build();
-
-								return branchRepository.save(updated, traceId);
+								if(product.getStock() == newStock) return Mono.just(product);
+								Product productUpdate = product.toBuilder().stock(newStock).build();
+								return productRepository.save(productUpdate, traceId);
 							})
 							.orElseGet(() -> Mono.error(new BusinessException(MessageError.RECORD_NOT_FOUND)));
-				});
-	}
-
-	public Mono<Branch> updateStock(int idBranch, int idProduct, int newStock, String traceId) {
-		return branchRepository.findById(idBranch, traceId)
-				.switchIfEmpty(Mono.error(new BusinessException(MessageError.RECORD_NOT_FOUND)))
-				.flatMap(branch -> {
-					java.util.List<Product> products = branch.getProducts() != null
-							? branch.getProducts()
-							: java.util.Collections.emptyList();
-
-					return products.stream()
-							.filter(p -> p.getId() == idProduct)
-							.findFirst()
-							.map(product -> {
-
-								Product productUpdate = product.toBuilder()
-										.stock(newStock)
-										.build();
-
-								productRepository.save(productUpdate, traceId);
-
-								List<Product> listProductUpdate = new java.util.ArrayList<>(products);
-								listProductUpdate.removeIf(p -> p.getId() == idProduct);
-								listProductUpdate.add(productUpdate);
-
-								Branch updated = branch.toBuilder()
-										.products(listProductUpdate)
-										.build();
-
-								return branchRepository.save(updated, traceId);
-							})
-							.orElseGet(() -> Mono.error(new BusinessException(MessageError.RECORD_NOT_FOUND)));
-				});
-	}
-
-	public Mono<Branch> query(String type, String traceId) {
-		return null;
+				}).then();
 	}
 
 	public Mono<Branch> updateBranch(int idBranch, String newNameBranch, String traceId) {

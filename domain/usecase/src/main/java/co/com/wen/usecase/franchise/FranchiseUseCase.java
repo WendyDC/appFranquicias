@@ -44,12 +44,15 @@ public class FranchiseUseCase {
 
 	private Mono<Franchise> addBranchFranchise(Franchise franchise, String nameBranch, String traceId) {
 		return branchRepository.save(buildBranch(franchise, nameBranch), traceId)
+
 				.flatMap(branch -> {
 					List<Branch> updateBranches = franchise.getBranches();
 					updateBranches.add(branch);
 					Franchise updatedFranchise = franchise.toBuilder().branches(updateBranches).build();
-					return franchiseRepository.save(updatedFranchise, traceId);
+					return Mono.just(updatedFranchise);
 				});
+
+
 	}
 
 	private Branch buildBranch(Franchise franchise, String nameBranch) {
@@ -67,5 +70,4 @@ public class FranchiseUseCase {
 					return franchiseRepository.save(updatedFranchise, traceId);
 				});
 	}
-
 }
