@@ -35,7 +35,7 @@ public class ProductHandler {
 								ValidationUtil.convertStringToInt(request.getIdProduct()),
 								request.getNewNameProduct(), traceId)
 						.doOnSuccess(response -> RestUtil.logInfoDetails("response UpdateProduct", response, traceId))
-						.flatMap(franchise -> RestUtil.buildGenericResponse(HttpStatus.OK, RestUtil.buildSuccessResponse("")))
+						.flatMap(product -> RestUtil.buildGenericResponse(HttpStatus.OK, RestUtil.buildSuccessResponse(product)))
 						.onErrorResume(
 								FranchiseException.class,
 								exception -> {

@@ -37,14 +37,9 @@ public class BranchUseCase {
 	private Mono<Branch> addBranchFranchise(Branch branch, String nameProduct, int stockProduct, String traceId) {
 		return productRepository.save(buildProduct(branch, nameProduct, stockProduct), traceId)
 				.flatMap(product -> {
-					Branch updatedBranch = branch.toBuilder()
-							.products(
-									branch.getProducts() != null ?
-											branch.getProducts().stream().toList() :
-											java.util.Collections.emptyList()
-							)
-							.build();
-					updatedBranch.getProducts().add(product);
+					List<Product> updateProducts = branch.getProducts();
+					updateProducts.add(product);
+					Branch updatedBranch = branch.toBuilder().products(updateProducts).build();
 					return branchRepository.save(updatedBranch, traceId);
 				});
 	}
@@ -62,7 +57,7 @@ public class BranchUseCase {
 							? branch.getProducts()
 							: java.util.Collections.emptyList();
 
-					return products.stream()
+					return branch.getProducts().stream()
 							.filter(p -> p.getId() == idProduct)
 							.findFirst()
 							.map(product -> {
@@ -120,6 +115,9 @@ public class BranchUseCase {
 		return branchRepository.findById(idBranch, traceId)
 				.switchIfEmpty(Mono.error(new BusinessException(MessageError.RECORD_NOT_FOUND)))
 				.flatMap(branch -> {
+					if(branch.getName().equalsIgnoreCase(newNameBranch)){
+						return Mono.just(branch);
+					}
 					Branch updatedBranch = branch.toBuilder().name(newNameBranch).build();
 					return branchRepository.save(updatedBranch, traceId);
 				});

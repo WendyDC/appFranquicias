@@ -9,6 +9,8 @@ import co.com.wen.model.util.MessageError;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 public class FranchiseUseCase {
 
@@ -43,14 +45,9 @@ public class FranchiseUseCase {
 	private Mono<Franchise> addBranchFranchise(Franchise franchise, String nameBranch, String traceId) {
 		return branchRepository.save(buildBranch(franchise, nameBranch), traceId)
 				.flatMap(branch -> {
-					Franchise updatedFranchise = franchise.toBuilder()
-							.branches(
-									franchise.getBranches() != null ?
-											franchise.getBranches().stream().toList() :
-											java.util.Collections.emptyList()
-							)
-							.build();
-					updatedFranchise.getBranches().add(branch);
+					List<Branch> updateBranches = franchise.getBranches();
+					updateBranches.add(branch);
+					Franchise updatedFranchise = franchise.toBuilder().branches(updateBranches).build();
 					return franchiseRepository.save(updatedFranchise, traceId);
 				});
 	}
@@ -63,6 +60,9 @@ public class FranchiseUseCase {
 		return franchiseRepository.findById(idFranchise, traceId)
 				.switchIfEmpty(Mono.error(new BusinessException(MessageError.RECORD_NOT_FOUND)))
 				.flatMap(franchise -> {
+					if(franchise.getName().equalsIgnoreCase(newNameFranchise)){
+						return Mono.just(franchise);
+					}
 					Franchise updatedFranchise = franchise.toBuilder().name(newNameFranchise).build();
 					return franchiseRepository.save(updatedFranchise, traceId);
 				});

@@ -16,6 +16,9 @@ public class ProductUseCase {
 		return productRepository.findById(idProduct, traceId)
 				.switchIfEmpty(Mono.error(new BusinessException(MessageError.RECORD_NOT_FOUND)))
 				.flatMap(product -> {
+					if(product.getName().equalsIgnoreCase(newNameProduct)){
+						return Mono.just(product);
+					}
 					Product updatedProduct = product.toBuilder().name(newNameProduct).build();
 					return productRepository.save(updatedProduct, traceId);
 				});
