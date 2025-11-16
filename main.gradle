@@ -28,6 +28,7 @@ subprojects {
     }
 
     dependencies {
+		implementation platform('software.amazon.awssdk:bom:2.33.1')
         implementation 'io.projectreactor:reactor-core'
         implementation 'io.projectreactor.addons:reactor-extra'
 
@@ -128,5 +129,5 @@ pitestReportAggregate {
 }
 
 tasks.named('wrapper') {
-    gradleVersion = '8.14.3'
+    gradleVersion = '8.5'
 }
