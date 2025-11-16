@@ -12,12 +12,12 @@ public class ProductUseCase {
 
 	private final ProductRepository productRepository;
 
-	public Mono<Product> updateProduct(int idProduct, String newNameProduct) {
-		return productRepository.findById(idProduct)
+	public Mono<Product> updateProduct(int idProduct, String newNameProduct, String traceId) {
+		return productRepository.findById(idProduct, traceId)
 				.switchIfEmpty(Mono.error(new BusinessException(MessageError.RECORD_NOT_FOUND)))
 				.flatMap(product -> {
 					Product updatedProduct = product.toBuilder().name(newNameProduct).build();
-					return productRepository.save(updatedProduct);
+					return productRepository.save(updatedProduct, traceId);
 				});
 	}
 }

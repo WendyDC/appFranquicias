@@ -15,20 +15,19 @@ public class FranchiseUseCase {
 	private final FranchiseRepository franchiseRepository;
 	private final BranchRepository branchRepository;
 
-	public Mono<Franchise> createFranchise(String name) {
-		return franchiseRepository.save(buildFranchise(name))
-				.switchIfEmpty(Mono.error(new BusinessException(MessageError.NOT_SAVE_RECORD)));
+	public Mono<Franchise> createFranchise(String name, String traceId) {
+		return franchiseRepository.save(buildFranchise(name), traceId);
 	}
 
 	private Franchise buildFranchise(String name) {
 		return Franchise.builder().name(name).build();
 	}
 
-	public Mono<Franchise> addBranch(int idFranchise, String nameBranch) {
-		return franchiseRepository.findById(idFranchise)
+	public Mono<Franchise> addBranch(int idFranchise, String nameBranch, String traceId) {
+		return franchiseRepository.findById(idFranchise, traceId)
 				.flatMap(franchise -> {
 					validateBranchExistence(franchise, nameBranch);
-					return addBranchFranchise(franchise, nameBranch);
+					return addBranchFranchise(franchise, nameBranch, traceId);
 				});
 	}
 
@@ -41,8 +40,8 @@ public class FranchiseUseCase {
 				});
 	}
 
-	private Mono<Franchise> addBranchFranchise(Franchise franchise, String nameBranch) {
-		return branchRepository.save(buildBranch(franchise, nameBranch))
+	private Mono<Franchise> addBranchFranchise(Franchise franchise, String nameBranch, String traceId) {
+		return branchRepository.save(buildBranch(franchise, nameBranch), traceId)
 				.flatMap(branch -> {
 					Franchise updatedFranchise = franchise.toBuilder()
 							.branches(
@@ -52,7 +51,7 @@ public class FranchiseUseCase {
 							)
 							.build();
 					updatedFranchise.getBranches().add(branch);
-					return franchiseRepository.save(updatedFranchise);
+					return franchiseRepository.save(updatedFranchise, traceId);
 				});
 	}
 
@@ -60,12 +59,12 @@ public class FranchiseUseCase {
 		return Branch.builder().name(nameBranch).idFranchise(franchise.getId()).build();
 	}
 
-	public Mono<Franchise> updateFranchise(int idFranchise, String newNameFranchise) {
-		return franchiseRepository.findById(idFranchise)
+	public Mono<Franchise> updateFranchise(int idFranchise, String newNameFranchise, String traceId) {
+		return franchiseRepository.findById(idFranchise, traceId)
 				.switchIfEmpty(Mono.error(new BusinessException(MessageError.RECORD_NOT_FOUND)))
 				.flatMap(franchise -> {
 					Franchise updatedFranchise = franchise.toBuilder().name(newNameFranchise).build();
-					return franchiseRepository.save(updatedFranchise);
+					return franchiseRepository.save(updatedFranchise, traceId);
 				});
 	}
 

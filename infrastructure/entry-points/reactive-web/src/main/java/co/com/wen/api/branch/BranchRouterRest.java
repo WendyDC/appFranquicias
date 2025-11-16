@@ -14,8 +14,9 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 
 @Configuration
 public class BranchRouterRest{
+
 	@Bean
-	public RouterFunction<ServerResponse> routerFunction(BranchHandler branchHandler) {
+	public RouterFunction<ServerResponse> branchRouterFunction(BranchHandler branchHandler) {
 		return route(POST(RestConstants.PATH_BRANCH_PRODUCTS), branchHandler::listenPOSTAddProductUseCase)
 				.andRoute(DELETE(RestConstants.PATH_BRANCH_PRODUCTS), branchHandler::listenDELETEProductUseCase)
 				.andRoute(PUT(RestConstants.PATH_BRANCH_PRODUCTS), branchHandler::listenPUTStockUseCase)

@@ -5,6 +5,6 @@ import reactor.core.publisher.Mono;
 
 public interface ProductRepository {
 
-	Mono<Product> save(Product product);
-	Mono<Product> findById(int idProduct);
+	Mono<Product> save(Product product, String traceId);
+	Mono<Product> findById(Integer idProduct, String traceId);
 }

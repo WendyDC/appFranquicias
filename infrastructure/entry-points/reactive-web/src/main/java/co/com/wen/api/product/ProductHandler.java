@@ -33,7 +33,7 @@ public class ProductHandler {
 		return validateUpdateProductRequest(request, traceId)
 				.switchIfEmpty(Mono.defer(() -> productUseCase.updateProduct(
 								ValidationUtil.convertStringToInt(request.getIdProduct()),
-								request.getNewNameProduct())
+								request.getNewNameProduct(), traceId)
 						.doOnSuccess(response -> RestUtil.logInfoDetails("response UpdateProduct", response, traceId))
 						.flatMap(franchise -> RestUtil.buildGenericResponse(HttpStatus.OK, RestUtil.buildSuccessResponse("")))
 						.onErrorResume(

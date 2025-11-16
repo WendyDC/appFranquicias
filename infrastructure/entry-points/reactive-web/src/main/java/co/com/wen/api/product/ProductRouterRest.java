@@ -11,8 +11,9 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 
 @Configuration
 public class ProductRouterRest {
+
 	@Bean
-	public RouterFunction<ServerResponse> routerFunction(ProductHandler productHandler) {
+	public RouterFunction<ServerResponse> productRouterFunction(ProductHandler productHandler) {
 		return route(PUT(RestConstants.PATH_PRODUCT), productHandler::listenPUTUpdateProductUseCase);
 	}
 }

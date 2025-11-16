@@ -34,7 +34,7 @@ public class FranchiseHandler {
 	private Mono<ServerResponse> createFranchiseUseCase(CreateFranchiseRequest request, String traceId) {
 		return validateCreateFranchiseRequest(request, traceId)
 				.switchIfEmpty(Mono.defer(() ->
-								franchiseUseCase.createFranchise(request.getName())
+								franchiseUseCase.createFranchise(request.getName(), traceId)
 										.doOnSuccess(response -> RestUtil.logInfoDetails("response CreateFranchise", response, traceId))
 										.flatMap(franchise -> RestUtil.buildGenericResponse(HttpStatus.OK,
 												RestUtil.buildSuccessResponse(franchise)))
@@ -69,7 +69,7 @@ public class FranchiseHandler {
 				.switchIfEmpty(Mono.defer(() ->
 								franchiseUseCase.addBranch(
 										ValidationUtil.convertStringToInt(request.getIdFranchise()),
-										request.getNameBranch())
+										request.getNameBranch(), traceId)
 									.doOnSuccess(response -> RestUtil.logInfoDetails("response AddBranch", response, traceId))
 									.flatMap(franchise -> RestUtil.buildGenericResponse(HttpStatus.OK,
 											RestUtil.buildSuccessResponse(franchise)))
@@ -106,7 +106,7 @@ public class FranchiseHandler {
 				.switchIfEmpty(Mono.defer(() ->
 								franchiseUseCase.updateFranchise(
 										ValidationUtil.convertStringToInt(request.getIdFranchise()),
-										request.getNewNameFranchise())
+										request.getNewNameFranchise(), traceId)
 									.doOnSuccess(response -> RestUtil.logInfoDetails("response UpdateFranchise", response, traceId))
 									.flatMap(franchise -> RestUtil.buildGenericResponse(HttpStatus.OK,
 											RestUtil.buildSuccessResponse(franchise)))

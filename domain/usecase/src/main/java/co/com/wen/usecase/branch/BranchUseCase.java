@@ -17,11 +17,11 @@ public class BranchUseCase {
 	private final BranchRepository branchRepository;
 	private final ProductRepository productRepository;
 
-	public Mono<Branch> addProduct(int idBranch, String nameProduct, int stockProduct) {
-		return branchRepository.findById(idBranch)
+	public Mono<Branch> addProduct(int idBranch, String nameProduct, int stockProduct, String traceId) {
+		return branchRepository.findById(idBranch, traceId)
 				.flatMap(branch -> {
 					validateBranchExistence(branch, nameProduct);
-					return addBranchFranchise(branch, nameProduct, stockProduct);
+					return addBranchFranchise(branch, nameProduct, stockProduct, traceId);
 				});
 	}
 
@@ -34,8 +34,8 @@ public class BranchUseCase {
 				});
 	}
 
-	private Mono<Branch> addBranchFranchise(Branch branch, String nameProduct, int stockProduct) {
-		return productRepository.save(buildProduct(branch, nameProduct, stockProduct))
+	private Mono<Branch> addBranchFranchise(Branch branch, String nameProduct, int stockProduct, String traceId) {
+		return productRepository.save(buildProduct(branch, nameProduct, stockProduct), traceId)
 				.flatMap(product -> {
 					Branch updatedBranch = branch.toBuilder()
 							.products(
@@ -45,7 +45,7 @@ public class BranchUseCase {
 							)
 							.build();
 					updatedBranch.getProducts().add(product);
-					return branchRepository.save(updatedBranch);
+					return branchRepository.save(updatedBranch, traceId);
 				});
 	}
 
@@ -54,8 +54,8 @@ public class BranchUseCase {
 	}
 
 
-	public Mono<Branch> deleteProduct(int idBranch, int idProduct) {
-		return branchRepository.findById(idBranch)
+	public Mono<Branch> deleteProduct(int idBranch, int idProduct, String traceId) {
+		return branchRepository.findById(idBranch, traceId)
 				.switchIfEmpty(Mono.error(new BusinessException(MessageError.RECORD_NOT_FOUND)))
 				.flatMap(branch -> {
 					List<Product> products = branch.getProducts() != null
@@ -73,14 +73,14 @@ public class BranchUseCase {
 										.products(listProductUpdate)
 										.build();
 
-								return branchRepository.save(updated);
+								return branchRepository.save(updated, traceId);
 							})
 							.orElseGet(() -> Mono.error(new BusinessException(MessageError.RECORD_NOT_FOUND)));
 				});
 	}
 
-	public Mono<Branch> updateStock(int idBranch, int idProduct, int newStock) {
-		return branchRepository.findById(idBranch)
+	public Mono<Branch> updateStock(int idBranch, int idProduct, int newStock, String traceId) {
+		return branchRepository.findById(idBranch, traceId)
 				.switchIfEmpty(Mono.error(new BusinessException(MessageError.RECORD_NOT_FOUND)))
 				.flatMap(branch -> {
 					java.util.List<Product> products = branch.getProducts() != null
@@ -96,7 +96,7 @@ public class BranchUseCase {
 										.stock(newStock)
 										.build();
 
-								productRepository.save(productUpdate);
+								productRepository.save(productUpdate, traceId);
 
 								List<Product> listProductUpdate = new java.util.ArrayList<>(products);
 								listProductUpdate.removeIf(p -> p.getId() == idProduct);
@@ -106,22 +106,22 @@ public class BranchUseCase {
 										.products(listProductUpdate)
 										.build();
 
-								return branchRepository.save(updated);
+								return branchRepository.save(updated, traceId);
 							})
 							.orElseGet(() -> Mono.error(new BusinessException(MessageError.RECORD_NOT_FOUND)));
 				});
 	}
 
-	public Mono<Branch> query(String type) {
+	public Mono<Branch> query(String type, String traceId) {
 		return null;
 	}
 
-	public Mono<Branch> updateBranch(int idBranch, String newNameBranch) {
-		return branchRepository.findById(idBranch)
+	public Mono<Branch> updateBranch(int idBranch, String newNameBranch, String traceId) {
+		return branchRepository.findById(idBranch, traceId)
 				.switchIfEmpty(Mono.error(new BusinessException(MessageError.RECORD_NOT_FOUND)))
 				.flatMap(branch -> {
 					Branch updatedBranch = branch.toBuilder().name(newNameBranch).build();
-					return branchRepository.save(updatedBranch);
+					return branchRepository.save(updatedBranch, traceId);
 				});
 	}
 

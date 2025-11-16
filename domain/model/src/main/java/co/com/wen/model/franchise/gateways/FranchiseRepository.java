@@ -5,6 +5,6 @@ import reactor.core.publisher.Mono;
 
 public interface FranchiseRepository {
 
-	Mono<Franchise> save(Franchise franchise);
-	Mono<Franchise> findById(int idFranchise);
+	Mono<Franchise> save(Franchise franchise, String traceId);
+	Mono<Franchise> findById(Integer idFranchise, String traceId);
 }

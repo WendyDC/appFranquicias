@@ -11,3 +11,11 @@ spring:
       path: "/h2"
   profiles:
     include:
+adapters:
+  r2dbc:
+    host: ""
+    port: 5432
+    database: ""
+    schema: ""
+    username: ""
+    password: ""

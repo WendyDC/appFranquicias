@@ -38,7 +38,7 @@ public class BranchHandler {
 				.switchIfEmpty(Mono.defer(() -> branchUseCase.addProduct(
 								ValidationUtil.convertStringToInt(request.getIdBranch()),
 								request.getNameProduct(),
-								ValidationUtil.convertStringToInt(request.getStockProduct()))
+								ValidationUtil.convertStringToInt(request.getStockProduct()), traceId)
 						.doOnSuccess(response -> RestUtil.logInfoDetails("response AddProduct", response, traceId))
 						.flatMap(franchise -> RestUtil.buildGenericResponse(HttpStatus.OK, RestUtil.buildSuccessResponse("")))
 						.onErrorResume(
@@ -74,7 +74,7 @@ public class BranchHandler {
 		return validateDeleteProductRequest(request, traceId)
 				.switchIfEmpty(Mono.defer(() -> branchUseCase.deleteProduct(
 								ValidationUtil.convertStringToInt(request.getIdBranch()),
-								ValidationUtil.convertStringToInt(request.getIdProduct()))
+								ValidationUtil.convertStringToInt(request.getIdProduct()), traceId)
 						.doOnSuccess(response -> RestUtil.logInfoDetails("response DeleteProduct", response, traceId))
 						.flatMap(franchise -> RestUtil.buildGenericResponse(HttpStatus.OK, RestUtil.buildSuccessResponse("")))
 						.onErrorResume(
@@ -111,7 +111,7 @@ public class BranchHandler {
 				.switchIfEmpty(Mono.defer(() -> branchUseCase.updateStock(
 								ValidationUtil.convertStringToInt(request.getIdBranch()),
 								ValidationUtil.convertStringToInt(request.getIdProduct()),
-								ValidationUtil.convertStringToInt(request.getNewStock()))
+								ValidationUtil.convertStringToInt(request.getNewStock()), traceId)
 						.doOnSuccess(response -> RestUtil.logInfoDetails("response UpdateStock", response, traceId))
 						.flatMap(franchise -> RestUtil.buildGenericResponse(HttpStatus.OK, RestUtil.buildSuccessResponse("")))
 						.onErrorResume(
@@ -147,7 +147,7 @@ public class BranchHandler {
 
 	private Mono<ServerResponse> getQueryUseCase(QueryRequest request, String traceId) {
 		return validateQueryRequest(request, traceId)
-				.switchIfEmpty(Mono.defer(() -> branchUseCase.query(request.getType())
+				.switchIfEmpty(Mono.defer(() -> branchUseCase.query(request.getType(), traceId)
 						.doOnSuccess(response -> RestUtil.logInfoDetails("response Query", response, traceId))
 						.flatMap(franchise -> RestUtil.buildGenericResponse(HttpStatus.OK, RestUtil.buildSuccessResponse("")))
 						.onErrorResume(
@@ -180,7 +180,7 @@ public class BranchHandler {
 		return validateUpdateBranchRequest(request, traceId)
 				.switchIfEmpty(Mono.defer(() -> branchUseCase.updateBranch(
 								ValidationUtil.convertStringToInt(request.getIdBranch()),
-								request.getNewNameBranch())
+								request.getNewNameBranch(), traceId)
 						.doOnSuccess(response -> RestUtil.logInfoDetails("response UpdateBranch", response, traceId))
 						.flatMap(franchise -> RestUtil.buildGenericResponse(HttpStatus.OK, RestUtil.buildSuccessResponse("")))
 						.onErrorResume(
