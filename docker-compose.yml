@@ -1,0 +1,42 @@
+services:
+  postgres-db:
+    container_name: postgres-db
+    image: postgres:16.10-alpine3.21
+    environment:
+      POSTGRES_DB: franchises_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_nequi:/var/lib/postgresql/data
+      - ./deployment/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - nequi
+
+  ms-app-franquicias:
+    container_name: ms-app-franquicias
+    build:
+      context: .
+      dockerfile: deployment/Dockerfile
+    environment:
+      POSTGRES_HOST: postgres-db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: franchises_db
+      POSTGRES_SCHEMA: public
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres-db
+    networks:
+      - nequi
+
+volumes:
+  postgres_nequi:
+    external: false
+
+networks:
+  nequi:
+    driver: bridge
